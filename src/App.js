@@ -10,6 +10,7 @@ import { rateData } from './components/rateData';
 import Header from './components/Header';
 import { db } from './firebaseConfig';
 import { collection, getDocs, addDoc } from 'firebase/firestore';
+import { updateDoc, doc } from 'firebase/firestore';
 
 function App() {
   const [players, setPlayers] = useState([]);
@@ -35,6 +36,16 @@ function App() {
     setPlayers((prevPlayers) => prevPlayers.filter(player => player.playerName !== playerName));
   };
 
+  const updatePlayer = async (updatedPlayer) => {
+    const playerRef = doc(db, "players", updatedPlayer.id); // プレイヤーのFirestore IDを参照
+    await updateDoc(playerRef, {
+      playerName: updatedPlayer.playerName,
+      mainRole: updatedPlayer.mainRole,
+      mainRate: updatedPlayer.mainRate,
+      subRate: updatedPlayer.subRate
+    });
+  };
+
   return (
     <Router>
       <Routes>
@@ -44,6 +55,7 @@ function App() {
         <Route path="/team-assignment" element={<TeamAssignment players={players} setPlayers={setPlayers} />} />
         <Route path="/match-result" element={<MatchResult players={players} />} />
         <Route path="/match-history" element={<MatchHistory players={players} />} />
+        <Route path="/players" element={<PlayerList players={players} setPlayers={setPlayers} updatePlayer={updatePlayer} />} />
       </Routes>
     </Router>
   );
