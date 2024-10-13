@@ -61,11 +61,11 @@ useEffect(() => {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/register" element={<PlayerRegistration addPlayer={addPlayer} />} />
-        <Route path="/players" element={<PlayerList players={players} setPlayers={setPlayers} />} />
         <Route path="/team-assignment" element={<TeamAssignment players={players} setPlayers={setPlayers} />} />
         <Route path="/match-result" element={<MatchResult players={players} />} />
         <Route path="/match-history" element={<MatchHistory players={players} />} />
         <Route path="/players" element={<PlayerList players={players} setPlayers={setPlayers} updatePlayer={updatePlayer} />} />
+
       </Routes>
     </Router>
   );
