@@ -15,9 +15,13 @@ const PlayerList = ({ players, setPlayers, updatePlayer }) => {
     setPreferredRoles(player.preferredRoles || ['', '', '']); // 優先ロールの初期値を設定
   };
 
-  // 編集内容を保存する
   const handleSaveClick = async () => {
-    console.log('更新するプレイヤー:', editingPlayer); // デバッグ用
+    console.log('updatePlayer:', typeof updatePlayer); // デバッグ用
+    if (typeof updatePlayer !== 'function') {
+      console.error('updatePlayerが関数ではありません。');
+      return;
+    }
+  
     const updatedPlayer = {
       ...editingPlayer,
       playerName: editedName,
@@ -26,15 +30,16 @@ const PlayerList = ({ players, setPlayers, updatePlayer }) => {
     };
   
     try {
-      await updatePlayer(updatedPlayer);  // ここで問題が起きている
+      await updatePlayer(updatedPlayer);
       console.log("プレイヤー情報を更新しました");
       
       setPlayers(players.map(player => player.id === editingPlayer.id ? updatedPlayer : player));
-      setEditingPlayer(null); // 編集モード終了
+      setEditingPlayer(null);
     } catch (error) {
       console.error("プレイヤー情報の更新に失敗しました: ", error);
     }
   };
+  
 
   // 優先ロールの変更を管理する関数
   const handlePreferredRoleChange = (index, value) => {
