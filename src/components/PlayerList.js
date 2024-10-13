@@ -16,7 +16,7 @@ const PlayerList = ({ players, setPlayers, updatePlayer }) => {
   };
 
   // 編集内容を保存する
-  const handleSaveClick = () => {
+  const handleSaveClick = async () => {
     const updatedPlayer = {
       ...editingPlayer,
       playerName: editedName,
@@ -25,10 +25,16 @@ const PlayerList = ({ players, setPlayers, updatePlayer }) => {
     };
 
     // Firestoreの更新処理
-    updatePlayer(updatedPlayer);
+    try {
+      await updatePlayer(updatedPlayer);
 
-    // ローカルの状態を更新
-    setPlayers(players.map(player => player.playerName === editingPlayer.playerName ? updatedPlayer : player));
+      // ローカルの状態を更新
+      setPlayers(players.map(player => player.id === editingPlayer.id ? updatedPlayer : player));
+
+      console.log("プレイヤー情報を更新しました");
+    } catch (error) {
+      console.error("プレイヤー情報の更新に失敗しました: ", error);
+    }
 
     setEditingPlayer(null); // 編集モード終了
   };
@@ -48,7 +54,7 @@ const PlayerList = ({ players, setPlayers, updatePlayer }) => {
         <ul>
           {players.map((player, index) => (
             <li key={index} className="flex justify-between items-center p-4 mb-2 bg-gray-100 rounded">
-              {editingPlayer?.playerName === player.playerName ? (
+              {editingPlayer?.id === player.id ? (
                 <>
                   <input
                     type="text"

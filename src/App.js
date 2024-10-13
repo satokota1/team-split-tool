@@ -16,14 +16,17 @@ function App() {
   const [players, setPlayers] = useState([]);
 
   // Firestoreからプレイヤーデータを取得
-  useEffect(() => {
-    const fetchPlayers = async () => {
-      const querySnapshot = await getDocs(collection(db, "players"));
-      const playersData = querySnapshot.docs.map(doc => doc.data());
-      setPlayers(playersData);
-    };
-    fetchPlayers();
-  }, []);
+useEffect(() => {
+  const fetchPlayers = async () => {
+    const querySnapshot = await getDocs(collection(db, "players"));
+    const playersData = querySnapshot.docs.map(doc => ({
+      id: doc.id,  // ドキュメントIDを取得
+      ...doc.data(),
+    }));
+    setPlayers(playersData);
+  };
+  fetchPlayers();
+}, []);
 
   // プレイヤーをFirestoreに追加
   const addPlayer = async (player) => {
@@ -37,15 +40,21 @@ function App() {
   };
 
   const updatePlayer = async (updatedPlayer) => {
-    const playerRef = doc(db, "players", updatedPlayer.id); // Firestore上のプレイヤーのドキュメント参照
-    await updateDoc(playerRef, {
-      playerName: updatedPlayer.playerName,
-      mainRole: updatedPlayer.mainRole,
-      mainRate: updatedPlayer.mainRate,
-      subRate: updatedPlayer.subRate,
-      preferredRoles: updatedPlayer.preferredRoles,  // 優先ロールをFirestoreに保存
-    });
+    try {
+      const playerRef = doc(db, "players", updatedPlayer.id); // ドキュメント参照
+      await updateDoc(playerRef, {
+        playerName: updatedPlayer.playerName,
+        mainRole: updatedPlayer.mainRole,
+        mainRate: updatedPlayer.mainRate,
+        subRate: updatedPlayer.subRate,
+        preferredRoles: updatedPlayer.preferredRoles,  // 優先ロールをFirestoreに保存
+      });
+      console.log("プレイヤー情報を更新しました");
+    } catch (error) {
+      console.error("プレイヤー情報の更新に失敗しました: ", error);
+    }
   };
+  
 
   return (
     <Router>
