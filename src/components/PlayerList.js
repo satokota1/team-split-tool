@@ -1,12 +1,43 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Header from './Header';
 
-const PlayerList = ({ players, setPlayers }) => {
-  const handleRemovePlayer = (playerName) => {
-    const confirmDelete = window.confirm(`${playerName}を削除しますか？`);
-    if (confirmDelete) {
-      setPlayers(players.filter(player => player.playerName !== playerName));
-    }
+const PlayerList = ({ players, setPlayers, updatePlayer }) => {
+  const [editingPlayer, setEditingPlayer] = useState(null);
+  const [editedName, setEditedName] = useState('');
+  const [editedRole, setEditedRole] = useState('');
+  const [preferredRoles, setPreferredRoles] = useState(['', '', '']);
+
+  // 編集モードに入る
+  const handleEditClick = (player) => {
+    setEditingPlayer(player);
+    setEditedName(player.playerName);
+    setEditedRole(player.mainRole);
+    setPreferredRoles(player.preferredRoles || ['', '', '']); // 優先ロールの初期値を設定
+  };
+
+  // 編集内容を保存する
+  const handleSaveClick = () => {
+    const updatedPlayer = {
+      ...editingPlayer,
+      playerName: editedName,
+      mainRole: editedRole,
+      preferredRoles: preferredRoles,
+    };
+
+    // Firestoreの更新処理
+    updatePlayer(updatedPlayer);
+
+    // ローカルの状態を更新
+    setPlayers(players.map(player => player.playerName === editingPlayer.playerName ? updatedPlayer : player));
+
+    setEditingPlayer(null); // 編集モード終了
+  };
+
+  // 優先ロールの変更を管理する関数
+  const handlePreferredRoleChange = (index, value) => {
+    const updatedRoles = [...preferredRoles];
+    updatedRoles[index] = value;
+    setPreferredRoles(updatedRoles);
   };
 
   return (
@@ -17,8 +48,44 @@ const PlayerList = ({ players, setPlayers }) => {
         <ul>
           {players.map((player, index) => (
             <li key={index} className="flex justify-between items-center p-4 mb-2 bg-gray-100 rounded">
-              <span>{player.playerName} ({player.mainRole}) - メインレート: {player.mainRate}, サブレート: {player.subRate}</span>
-              <button onClick={() => handleRemovePlayer(player.playerName)} className="btn bg-red-500 hover:bg-red-700 text-white py-1 px-2 rounded">削除</button>
+              {editingPlayer?.playerName === player.playerName ? (
+                <>
+                  <input
+                    type="text"
+                    value={editedName}
+                    onChange={(e) => setEditedName(e.target.value)}
+                    className="border rounded py-1 px-2"
+                  />
+                  <input
+                    type="text"
+                    value={editedRole}
+                    onChange={(e) => setEditedRole(e.target.value)}
+                    className="border rounded py-1 px-2"
+                  />
+                  {preferredRoles.map((role, index) => (
+                    <select
+                      key={index}
+                      value={role}
+                      onChange={(e) => handlePreferredRoleChange(index, e.target.value)}
+                      className="border rounded py-1 px-2 ml-2"
+                    >
+                      <option value="">選択してください</option>
+                      <option value="TOP">TOP</option>
+                      <option value="JUNGLE">JUNGLE</option>
+                      <option value="MID">MID</option>
+                      <option value="ADC">ADC</option>
+                      <option value="SUP">SUP</option>
+                      <option value="FILL">FILL</option>
+                    </select>
+                  ))}
+                  <button onClick={handleSaveClick} className="btn bg-green-500 hover:bg-green-700 text-white py-1 px-2 rounded">保存</button>
+                </>
+              ) : (
+                <>
+                  <span>{player.playerName} ({player.mainRole}) - メインレート: {player.mainRate}, サブレート: {player.subRate}, 優先ロール: {player.preferredRoles.join(', ')}</span>
+                  <button onClick={() => handleEditClick(player)} className="btn bg-yellow-500 hover:bg-yellow-700 text-white py-1 px-2 rounded">編集</button>
+                </>
+              )}
             </li>
           ))}
         </ul>
