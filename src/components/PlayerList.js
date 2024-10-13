@@ -15,6 +15,7 @@ const PlayerList = ({ players, setPlayers, updatePlayer }) => {
     setPreferredRoles(player.preferredRoles || ['', '', '']); // 優先ロールの初期値を設定
   };
 
+  // 編集内容を保存する
   const handleSaveClick = async () => {
     console.log('更新するプレイヤー:', editingPlayer); // デバッグ用
     const updatedPlayer = {
@@ -29,14 +30,10 @@ const PlayerList = ({ players, setPlayers, updatePlayer }) => {
       console.log("プレイヤー情報を更新しました");
       
       setPlayers(players.map(player => player.id === editingPlayer.id ? updatedPlayer : player));
-      setEditingPlayer(null);
+      setEditingPlayer(null); // 編集モード終了
     } catch (error) {
       console.error("プレイヤー情報の更新に失敗しました: ", error);
     }
-  };
-  
-
-    setEditingPlayer(null); // 編集モード終了
   };
 
   // 優先ロールの変更を管理する関数
@@ -51,6 +48,7 @@ const PlayerList = ({ players, setPlayers, updatePlayer }) => {
       <Header />
       <div className="player-list">
         <h2 className="text-3xl font-bold mb-4">プレイヤー一覧</h2>
+        <h4 className="text-3xl font-bold mb-4">間違えて登録して削除したい場合はこにーまで連絡を</h4>
         <ul>
           {players.map((player, index) => (
             <li key={index} className="flex justify-between items-center p-4 mb-2 bg-gray-100 rounded">
