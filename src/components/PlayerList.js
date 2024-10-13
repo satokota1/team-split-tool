@@ -15,26 +15,26 @@ const PlayerList = ({ players, setPlayers, updatePlayer }) => {
     setPreferredRoles(player.preferredRoles || ['', '', '']); // 優先ロールの初期値を設定
   };
 
-  // 編集内容を保存する
   const handleSaveClick = async () => {
+    console.log('更新するプレイヤー:', editingPlayer); // デバッグ用
     const updatedPlayer = {
       ...editingPlayer,
       playerName: editedName,
       mainRole: editedRole,
       preferredRoles: preferredRoles,
     };
-
-    // Firestoreの更新処理
+  
     try {
-      await updatePlayer(updatedPlayer);
-
-      // ローカルの状態を更新
-      setPlayers(players.map(player => player.id === editingPlayer.id ? updatedPlayer : player));
-
+      await updatePlayer(updatedPlayer);  // ここで問題が起きている
       console.log("プレイヤー情報を更新しました");
+      
+      setPlayers(players.map(player => player.id === editingPlayer.id ? updatedPlayer : player));
+      setEditingPlayer(null);
     } catch (error) {
       console.error("プレイヤー情報の更新に失敗しました: ", error);
     }
+  };
+  
 
     setEditingPlayer(null); // 編集モード終了
   };
