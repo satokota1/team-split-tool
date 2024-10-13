@@ -8,29 +8,29 @@ import MatchResult from './components/MatchResult';
 import MatchHistory from './components/MatchHistory';
 import { rateData } from './components/rateData';
 import Header from './components/Header';
+import { db } from './firebaseConfig';
+import { collection, getDocs, addDoc } from 'firebase/firestore';
 
 function App() {
   const [players, setPlayers] = useState([]);
 
-  // ローカルストレージからプレイヤーデータを読み込む
+  // Firestoreからプレイヤーデータを取得
   useEffect(() => {
-    const storedPlayers = JSON.parse(localStorage.getItem('players')) || [];
-    setPlayers(storedPlayers);
+    const fetchPlayers = async () => {
+      const querySnapshot = await getDocs(collection(db, "players"));
+      const playersData = querySnapshot.docs.map(doc => doc.data());
+      setPlayers(playersData);
+    };
+    fetchPlayers();
   }, []);
 
-  // プレイヤーデータが変更されたらローカルストレージに保存
-  useEffect(() => {
-    if (players.length > 0) {
-      localStorage.setItem('players', JSON.stringify(players));
-    }
-  }, [players]);
-
-  // プレイヤーを追加する関数
-  const addPlayer = (player) => {
-    setPlayers((prevPlayers) => [...prevPlayers, player]);
+  // プレイヤーをFirestoreに追加
+  const addPlayer = async (player) => {
+    await addDoc(collection(db, "players"), player);
+    setPlayers([...players, player]);
   };
 
-  // プレイヤーを削除する関数
+  // プレイヤーを削除する関数もFirestoreに合わせて修正できます
   const deletePlayer = (playerName) => {
     setPlayers((prevPlayers) => prevPlayers.filter(player => player.playerName !== playerName));
   };

@@ -9,20 +9,20 @@ const PlayerRegistration = ({ addPlayer }) => {
   const [rate, setRate] = useState('');
 
   const handleAddPlayer = () => {
-    if (!playerName || !rate) { // FILLの場合メインロールは必須ではないため変更
+    if (!playerName || !rate) {
       alert('プレイヤー名とレートを入力してください。');
       return;
     }
-
+  
     const newPlayer = {
       playerName,
-      mainRole, // FILLの場合、全ロールプレイ可能としてALLを割り当てる
-      preferredRoles: preferredRoles, // FILLの場合、全ロールプレイ可能としてALLを割り当てる
+      mainRole,
+      preferredRoles,
       mainRate: rateData[rate].main,
       subRate: rateData[rate].sub,
     };
-
-    addPlayer(newPlayer);
+  
+    addPlayer(newPlayer); // Firestoreにデータを保存
     setPlayerName('');
     setMainRole('');
     setPreferredRoles(['', '', '']);
